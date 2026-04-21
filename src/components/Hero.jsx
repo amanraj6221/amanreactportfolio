@@ -1,11 +1,15 @@
+// src/components/Hero.jsx
 import { motion } from "framer-motion";
 import { styles } from "../styles";
 import { ComputersCanvas } from "./canvas";
 
 const Hero = () => {
+  // ✅ Mobile check — Hero level pe
+  const isMobile = window.innerWidth <= 768;
+
   return (
     <section className="relative w-full min-h-screen mx-auto overflow-hidden">
-      
+
       {/* ===== TEXT ===== */}
       <div
         className={`absolute inset-0 top-[100px] sm:top-[120px] max-w-7xl mx-auto ${styles.paddingX}
@@ -20,7 +24,6 @@ const Hero = () => {
           <h1 className={`${styles.heroHeadText} text-white`}>
             Hi, I'm <span className="text-[#915EFF]">Aman Raj</span>
           </h1>
-
           <p className={`${styles.heroSubText} mt-2 text-white-100`}>
             Full Stack Developer | 3× Smart India Hackathon Finalist 🏆
             <br className="hidden sm:block" />
@@ -29,10 +32,12 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* ===== 3D (ALL DEVICES) ===== */}
-      <div className="w-full h-[60vh] sm:h-[70vh] md:h-[80vh] flex justify-center items-center">
-        <ComputersCanvas />
-      </div>
+      {/* ===== 3D — sirf desktop pe ===== */}
+      {!isMobile && (
+        <div className="w-full h-[60vh] sm:h-[70vh] md:h-[80vh] flex justify-center items-center">
+          <ComputersCanvas />
+        </div>
+      )}
 
       {/* ===== SCROLL ===== */}
       <div className="absolute bottom-10 w-full flex justify-center items-center">

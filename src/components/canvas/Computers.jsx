@@ -1,27 +1,28 @@
 // src/components/canvas/Computers.jsx
 import React, { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF } from "@react-three/drei";
+import { OrbitControls, Preload, useGLTF } from "@react-three/drei";
 import CanvasLoader from "../Loader";
 
-// ✅ CORRECT preload
-useGLTF.preload("/desktop_pc/scene.gltf");
-
-const Computers = ({ isMobile }) => {
-  // ✅ CORRECT PATH
+const Computers = () => {
   const computer = useGLTF("/desktop_pc/scene.gltf");
 
   return (
     <>
-      {/* ✅ LIGHTS (mobile + desktop stable) */}
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[5, 5, 5]} intensity={1} />
-      <pointLight position={[0, 0, 2]} intensity={1.2} />
-
+      <hemisphereLight intensity={0.15} groundColor="black" />
+      <spotLight
+        position={[-20, 50, 10]}
+        angle={0.12}
+        penumbra={1}
+        intensity={1}
+        castShadow
+        shadow-mapSize={1024}
+      />
+      <pointLight intensity={1} />
       <primitive
         object={computer.scene}
-        scale={isMobile ? 0.5 : 0.75}
-        position={isMobile ? [0, -2, 0] : [0, -3.25, -1.5]}
+        scale={0.75}
+        position={[0, -3.25, -1.5]}
         rotation={[-0.01, -0.2, -0.1]}
       />
     </>
@@ -29,45 +30,46 @@ const Computers = ({ isMobile }) => {
 };
 
 const ComputersCanvas = () => {
-  const [isMobile, setIsMobile] = useState(false);
+  // ✅ 
+  const [isMobile, setIsMobile] = useState(
+    () => window.matchMedia("(max-width: 768px)").matches
+  );
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    const mediaQuery = window.matchMedia("(max-width: 768px)");
+    const handleResize = (event) => setIsMobile(event.matches);
+    mediaQuery.addEventListener("change", handleResize);
+    return () => mediaQuery.removeEventListener("change", handleResize);
   }, []);
 
+  // 
+  if (isMobile) return null;
+
   return (
-    <div className="w-full h-[320px] sm:h-[420px] md:h-[520px] lg:h-[620px]">
+    <div className="w-full h-[520px] lg:h-[620px]">
       <Canvas
-        frameloop="always" // ✅ IMPORTANT (mobile animation fix)
-        dpr={isMobile ? 1 : [1, 2]}
+        shadows
+        frameloop="demand"
+        dpr={[1, 2]}
         camera={{
-          fov: isMobile ? 60 : 25,
-          position: isMobile ? [0, 1.5, 6] : [20, 3, 5],
+          fov: 25,
+          position: [20, 3, 5],
           near: 0.1,
           far: 200,
         }}
         gl={{
-          antialias: !isMobile,
-          powerPreference: isMobile ? "low-power" : "high-performance",
+          preserveDrawingBuffer: true,
         }}
       >
         <Suspense fallback={<CanvasLoader />}>
           <OrbitControls
-            enableZoom={false}
             autoRotate
-            autoRotateSpeed={1.2}
-            enableDamping
-            dampingFactor={0.05}
+            enableZoom={false}
             maxPolarAngle={Math.PI / 2}
             minPolarAngle={Math.PI / 2}
           />
-
-          <Computers isMobile={isMobile} />
+          <Computers />
+          <Preload all />
         </Suspense>
       </Canvas>
     </div>
