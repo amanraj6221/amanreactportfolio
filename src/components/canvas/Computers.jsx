@@ -1,23 +1,26 @@
+// src/components/canvas/Computers.jsx
 import React, { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Preload } from "@react-three/drei";
-
+import { OrbitControls, useGLTF } from "@react-three/drei";
 import CanvasLoader from "../Loader";
+
+// ✅ preload (important)
+useGLTF.preload("/desktop_pc/scene.gltf");
 
 const Computers = ({ isMobile }) => {
   const computer = useGLTF("/desktop_pc/scene.gltf");
 
   return (
     <>
-      {/* ✅ Balanced Lights (mobile friendly) */}
-      <ambientLight intensity={0.6} />
+      {/* ✅ LIGHTS (stable for mobile) */}
+      <ambientLight intensity={0.7} />
       <directionalLight position={[5, 5, 5]} intensity={1} />
-      <pointLight position={[0, 0, 3]} intensity={1.2} />
+      <pointLight position={[0, 0, 2]} intensity={1.2} />
 
       <primitive
         object={computer.scene}
-        scale={isMobile ? 0.5 : 0.75}   // ✅ better fit mobile
-        position={isMobile ? [0, -2.2, 0] : [0, -3.25, -1.5]} // ✅ FIX CENTER
+        scale={isMobile ? 0.45 : 0.75}
+        position={isMobile ? [0, -1.8, 0] : [0, -3.25, -1.5]}
         rotation={[-0.01, -0.2, -0.1]}
       />
     </>
@@ -28,37 +31,35 @@ const ComputersCanvas = () => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 768px)");
-    setIsMobile(mediaQuery.matches);
-
-    const handleResize = (e) => setIsMobile(e.matches);
-    mediaQuery.addEventListener("change", handleResize);
-
-    return () => mediaQuery.removeEventListener("change", handleResize);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   return (
-    <div className="w-full h-[320px] sm:h-[420px] md:h-[520px] lg:h-[620px] mt-10">
+    <div className="w-full h-[320px] sm:h-[420px] md:h-[520px] lg:h-[620px]">
       <Canvas
-        shadows
-        frameloop="always"
-        dpr={isMobile ? 1 : [1, 2]}  // ✅ performance control
+        frameloop="always" // ✅ IMPORTANT (mobile fix)
+        dpr={isMobile ? 1 : [1, 2]}
         camera={{
-          fov: isMobile ? 55 : 25,   // ✅ mobile wider view
+          fov: isMobile ? 60 : 25,
+          position: isMobile ? [0, 1.5, 6] : [20, 3, 5],
           near: 0.1,
           far: 200,
-          position: isMobile ? [0, 1.5, 5.5] : [20, 3, 5], // ✅ KEY FIX
         }}
         gl={{
-          preserveDrawingBuffer: true,
-          powerPreference: isMobile ? "low-power" : "high-performance", // ✅ smooth mobile
+          antialias: !isMobile,
+          powerPreference: isMobile ? "low-power" : "high-performance",
         }}
       >
         <Suspense fallback={<CanvasLoader />}>
           <OrbitControls
             enableZoom={false}
             autoRotate
-            autoRotateSpeed={1.2} // ✅ smoother
+            autoRotateSpeed={1.2}
             enableDamping
             dampingFactor={0.05}
             maxPolarAngle={Math.PI / 2}
@@ -66,8 +67,6 @@ const ComputersCanvas = () => {
           />
 
           <Computers isMobile={isMobile} />
-
-          <Preload all />
         </Suspense>
       </Canvas>
     </div>
