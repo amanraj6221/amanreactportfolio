@@ -1,28 +1,8 @@
 import { motion } from "framer-motion";
 import { styles } from "../styles";
 import { ComputersCanvas } from "./canvas";
-import { useEffect, useState } from "react";
 
 const Hero = () => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 768px)");
-
-    const handleMediaQueryChange = (event) => {
-      setIsMobile(event.matches);
-    };
-
-    // initial check
-    setIsMobile(mediaQuery.matches);
-
-    mediaQuery.addEventListener("change", handleMediaQueryChange);
-
-    return () => {
-      mediaQuery.removeEventListener("change", handleMediaQueryChange);
-    };
-  }, []);
-
   return (
     <section className="relative w-full min-h-screen mx-auto overflow-hidden">
       
@@ -51,26 +31,9 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* ===== 3D / FALLBACK ===== */}
+      {/* ===== 3D (ALL DEVICES) ===== */}
       <div className="w-full h-[60vh] sm:h-[70vh] md:h-[80vh] flex justify-center items-center">
-        
-        {isMobile ? (
-          // ✅ MOBILE SAFE VERSION
-          <div className="flex flex-col items-center justify-center gap-4">
-            <img
-              src="/logo.svg"
-              alt="preview"
-              className="w-[200px] sm:w-[250px] h-auto object-contain"
-            />
-            <p className="text-white text-center text-sm opacity-70">
-              Optimized for mobile 🚀
-            </p>
-          </div>
-        ) : (
-          // ✅ DESKTOP 3D VERSION
-          <ComputersCanvas />
-        )}
-
+        <ComputersCanvas />
       </div>
 
       {/* ===== SCROLL INDICATOR ===== */}
