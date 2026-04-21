@@ -4,23 +4,24 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import CanvasLoader from "../Loader";
 
-// ✅ preload (important)
-uuseGLTF("./desktop_pc/scene.gltf");
+// ✅ CORRECT preload
+useGLTF.preload("/desktop_pc/scene.gltf");
 
 const Computers = ({ isMobile }) => {
-  const computer = useGLTF("./desktop_pc/scene.gltf");
+  // ✅ CORRECT PATH
+  const computer = useGLTF("/desktop_pc/scene.gltf");
 
   return (
     <>
-      {/* ✅ LIGHTS (stable for mobile) */}
+      {/* ✅ LIGHTS (mobile + desktop stable) */}
       <ambientLight intensity={0.7} />
       <directionalLight position={[5, 5, 5]} intensity={1} />
       <pointLight position={[0, 0, 2]} intensity={1.2} />
 
       <primitive
         object={computer.scene}
-        scale={isMobile ? 0.45 : 0.75}
-        position={isMobile ? [0, -1.8, 0] : [0, -3.25, -1.5]}
+        scale={isMobile ? 0.5 : 0.75}
+        position={isMobile ? [0, -2, 0] : [0, -3.25, -1.5]}
         rotation={[-0.01, -0.2, -0.1]}
       />
     </>
@@ -42,7 +43,7 @@ const ComputersCanvas = () => {
   return (
     <div className="w-full h-[320px] sm:h-[420px] md:h-[520px] lg:h-[620px]">
       <Canvas
-        frameloop="always" // ✅ IMPORTANT (mobile fix)
+        frameloop="always" // ✅ IMPORTANT (mobile animation fix)
         dpr={isMobile ? 1 : [1, 2]}
         camera={{
           fov: isMobile ? 60 : 25,
