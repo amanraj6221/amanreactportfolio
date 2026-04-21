@@ -1,25 +1,27 @@
+// src/components/canvas/Computers.jsx
 import React, { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF } from "@react-three/drei";
+import { OrbitControls, useGLTF, Preload } from "@react-three/drei";
 
 import CanvasLoader from "../Loader";
 
 const Computers = ({ isMobile }) => {
-  const computer = useGLTF("/desktop_pc/scene.gltf"); // ✅ FIXED PATH
+  const computer = useGLTF("/desktop_pc/scene.gltf");
 
   return (
-    <mesh>
-      {/* LIGHTS (optimized) */}
-      <hemisphereLight intensity={0.3} groundColor="black" />
-      <pointLight intensity={0.8} />
+    <>
+      {/* LIGHTS (mobile + desktop dono ke liye balanced) */}
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[5, 5, 5]} intensity={1} />
+      <pointLight position={[0, 0, 5]} intensity={1} />
 
       <primitive
         object={computer.scene}
-        scale={isMobile ? 0.5 : 0.7}
-        position={isMobile ? [0, -3.5, -2] : [0, -4, -1.5]}
+        scale={isMobile ? 0.6 : 0.75}
+        position={isMobile ? [0, -1.8, 0] : [0, -3.25, -1.5]}
         rotation={[-0.01, -0.2, -0.1]}
       />
-    </mesh>
+    </>
   );
 };
 
@@ -27,47 +29,45 @@ const ComputersCanvas = () => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+    const mediaQuery = window.matchMedia("(max-width: 768px)");
+    setIsMobile(mediaQuery.matches);
+
+    const handleResize = (e) => setIsMobile(e.matches);
+    mediaQuery.addEventListener("change", handleResize);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleResize);
     };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-
-    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // 🔥 HARD STOP for mobile (best practice)
-  if (isMobile) {
-    return (
-      <div className="w-full h-[300px] flex justify-center items-center">
-        <img
-          src="/logo.svg"
-          alt="preview"
-          className="w-[200px] object-contain"
-        />
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full h-[400px] sm:h-[500px] md:h-[600px] mt-10">
+    <div className="w-full h-[350px] sm:h-[450px] md:h-[550px] lg:h-[650px] mt-10">
       <Canvas
+        shadows
         frameloop="demand"
-        dpr={[1, 1.5]} // ✅ optimized
-        camera={{ position: [20, 3, 5], fov: 25 }}
+        dpr={isMobile ? 1 : [1, 2]}
+        gl={{ preserveDrawingBuffer: true }}
+        camera={{
+          fov: isMobile ? 50 : 25,
+          near: 0.1,
+          far: 200,
+          position: isMobile ? [0, 2, 6] : [20, 3, 5],
+        }}
       >
         <Suspense fallback={<CanvasLoader />}>
           <OrbitControls
             enableZoom={false}
             autoRotate
+            autoRotateSpeed={1.5}
             enableDamping
             dampingFactor={0.05}
             maxPolarAngle={Math.PI / 2}
             minPolarAngle={Math.PI / 2}
           />
 
-          <Computers isMobile={false} />
+          <Computers isMobile={isMobile} />
+
+          <Preload all />
         </Suspense>
       </Canvas>
     </div>
