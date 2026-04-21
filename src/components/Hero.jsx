@@ -1,23 +1,31 @@
 import { motion } from "framer-motion";
 import { styles } from "../styles";
 import { ComputersCanvas } from "./canvas";
+import { useEffect, useState } from "react";
 
 const Hero = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   return (
     <section className="relative w-full min-h-screen mx-auto overflow-hidden">
       
-      {/* ===== TEXT CONTENT ===== */}
+      {/* ===== TEXT ===== */}
       <div
         className={`absolute inset-0 top-[100px] sm:top-[120px] max-w-7xl mx-auto ${styles.paddingX}
         flex flex-col sm:flex-row items-start gap-5`}
       >
-        {/* LEFT LINE */}
         <div className="flex flex-row sm:flex-col justify-center items-center mt-5 sm:mt-0">
           <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#915EFF]" />
           <div className="w-20 h-1 sm:w-1 sm:h-80 violet-gradient" />
         </div>
 
-        {/* TEXT */}
         <div>
           <h1 className={`${styles.heroHeadText} text-white`}>
             Hi, I'm <span className="text-[#915EFF]">Aman Raj</span>
@@ -31,12 +39,24 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* ===== 3D (ALL DEVICES) ===== */}
+      {/* ===== 3D / FALLBACK ===== */}
       <div className="w-full h-[60vh] sm:h-[70vh] md:h-[80vh] flex justify-center items-center">
-        <ComputersCanvas />
+        
+        {isMobile ? (
+          // ✅ MOBILE SAFE (NO CRASH)
+          <img
+            src="/logo.svg"
+            alt="preview"
+            className="w-[180px] sm:w-[220px] object-contain opacity-90"
+          />
+        ) : (
+          // ✅ DESKTOP FULL 3D
+          <ComputersCanvas />
+        )}
+
       </div>
 
-      {/* ===== SCROLL INDICATOR ===== */}
+      {/* ===== SCROLL ===== */}
       <div className="absolute bottom-10 w-full flex justify-center items-center">
         <a href="#about">
           <div className="w-[30px] h-[55px] sm:w-[35px] sm:h-[64px] rounded-3xl border-4 border-secondary flex justify-center items-start p-2">

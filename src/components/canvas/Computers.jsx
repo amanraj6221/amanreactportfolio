@@ -41,7 +41,7 @@ const ComputersCanvas = () => {
     <div className="w-full h-[320px] sm:h-[420px] md:h-[520px] lg:h-[620px] mt-10">
       <Canvas
         shadows
-        frameloop="demand"
+        frameloop="always"
         dpr={isMobile ? 1 : [1, 2]}  // ✅ performance control
         camera={{
           fov: isMobile ? 55 : 25,   // ✅ mobile wider view
