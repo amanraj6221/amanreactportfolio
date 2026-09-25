@@ -227,12 +227,16 @@ export const projects = [
     description:
       "Built a secure full-stack system using QR + OCR validation, real-time dashboards, and automated reporting.",
     tags: [
-      { name: "React.js", color: "blue-text-gradient" },
+      { name: "React & TypeScript", color: "blue-text-gradient" },
       { name: "Node.js", color: "green-text-gradient" },
-      { name: "MongoDB", color: "pink-text-gradient" },
+      { name: "MongoDB & Express", color: "pink-text-gradient" },
+      {
+        name: "Socket.io & Tailwind",
+        color: "orange-text-gradient",
+      },
     ],
     image: jobit,
-    source_code_link: "https://github.com/amanraj6221/sihpmsss-1728-",
+    source_code_link: "https://github.com/amanraj6221/Asha_PMSSS",
   },
   {
     name: "Inter-state Student Verification",
